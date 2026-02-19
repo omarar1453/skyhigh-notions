@@ -18,15 +18,15 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - name: Deploy to Hostinger via SSH
+      - name: Deploy to Hostinger via SFTP
         env:
-          SSH_PASS: ${{ secrets.SSH_PASS }}
+          SSHPASS: ${{ secrets.SSH_PASS }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
           SSH_USER: ${{ secrets.SSH_USER }}
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq sshpass
-          sshpass -p "$SSH_PASS" rsync -rlgoDzvc --delete \
-            -e "ssh -p $SSH_PORT -o StrictHostKeyChecking=no" \
+          sshpass -e rsync -rlgoDzvc --delete \
+            -e "ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no -o PubkeyAuthentication=no -o PreferredAuthentications=password" \
             ./out/ \
             ${SSH_USER}@${SSH_HOST}:/home/u217532441/domains/notion.skyhighers.online/public_html/
